@@ -895,3 +895,45 @@ To be decided.
 Disclaimer
 
 SCOPEX is a security research and defensive security project. Use it only against systems and infrastructure for which you have explicit authorization.
+
+
+Update:
+🚀 **SCOPEX — External Attack Surface Intelligence Platform**
+
+Today I completed the foundation of SCOPEX, a Windows-native platform I'm building for authorized external attack-surface intelligence.
+
+### Completed today
+
+• Built the core Python package architecture
+• Implemented Typer + Rich CLI
+• Added SQLite + SQLAlchemy database layer
+• Created Scan, Asset, Service, Evidence and Scope models
+• Implemented repository architecture
+• Built persistent authorization scope management
+• Added domain, IPv4 and CIDR validation
+• Added scope enable/disable/remove/check functionality
+• Added centralized logging with rotating log files
+• Added structured SCOPEX exception hierarchy
+• Built `scopex doctor` system diagnostics
+• Integrated Nmap environment detection
+• Converted the test suite to pytest
+• **18/18 tests passing ✅**
+
+### Security-first architecture
+
+A major design principle from day one is that reconnaissance must operate inside an explicit authorization boundary.
+
+Targets will have to pass SCOPEX's scope validation before future collectors can interact with them.
+
+### Next
+
+Phase 2: **DNS & Subdomain Intelligence**
+
+The goal is to move from the foundation into actual attack-surface discovery:
+
+DNS records → subdomains → assets → evidence → relationships → historical intelligence.
+
+This is still early, but the foundation is now in place.
+
+#CyberSecurity #Python #SecurityEngineering #OSINT #BugBounty #InfoSec #GitHub #BuildInPublic
+
