@@ -888,19 +888,9 @@ Project Status
 
 The project is currently being designed with a modular architecture so individual reconnaissance and intelligence components can be developed, tested, replaced, and extended independently.
 
-License
 
-To be decided.
-
-Disclaimer
-
+< day 2 >
 SCOPEX is a security research and defensive security project. Use it only against systems and infrastructure for which you have explicit authorization.
-
-
-Update:
-🚀 **SCOPEX — External Attack Surface Intelligence Platform**
-
-Today I completed the foundation of SCOPEX, a Windows-native platform I'm building for authorized external attack-surface intelligence.
 
 ### Completed today
 
@@ -919,21 +909,56 @@ Today I completed the foundation of SCOPEX, a Windows-native platform I'm buildi
 • Converted the test suite to pytest
 • **18/18 tests passing ✅**
 
-### Security-first architecture
+## Current Progress
 
-A major design principle from day one is that reconnaissance must operate inside an explicit authorization boundary.
+### DNS Reconnaissance & Scan Orchestration
 
-Targets will have to pass SCOPEX's scope validation before future collectors can interact with them.
+The DNS reconnaissance pipeline is now implemented as an end-to-end workflow:
 
-### Next
+```text
+Authorized Scope
+       ↓
+Subdomain Discovery
+       ↓
+DNS Resolution
+       ↓
+Asset Intelligence
+       ↓
+Assets + Evidence
+       ↓
+SQLite Persistence
+       ↓
+Scan Summary
+```
 
-Phase 2: **DNS & Subdomain Intelligence**
+Current capabilities include:
 
-The goal is to move from the foundation into actual attack-surface discovery:
+* Authorized domain scope validation
+* Root-domain and wordlist-based subdomain discovery
+* Duplicate, blank, and comment handling in wordlists
+* Structured A, AAAA, and CNAME resolution
+* Resolution status classification:
 
-DNS records → subdomains → assets → evidence → relationships → historical intelligence.
+  * Resolved
+  * Partial
+  * Unresolved
+  * Error
+* Persistent asset creation for domains and discovered IP addresses
+* Structured DNS evidence storage
+* Deterministic evidence confidence scoring
+* Scan lifecycle tracking with running, completed, and failed states
+* Scan completion timestamps and error tracking
+* End-to-end scan summaries
+* CLI integration for DNS reconnaissance
+* Controlled rejection of unsupported IP targets
+* Missing-wordlist validation
+* Comprehensive automated test coverage
 
-This is still early, but the foundation is now in place.
+### Test Status
 
-#CyberSecurity #Python #SecurityEngineering #OSINT #BugBounty #InfoSec #GitHub #BuildInPublic
+The complete SCOPEX test suite currently passes successfully:
 
+```text
+134 passed
+0 failed
+```
