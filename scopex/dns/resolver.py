@@ -23,13 +23,6 @@ from scopex.core.exceptions import CollectorError
 class DNSResult:
     """
     Represents the result of one DNS query.
-
-    Attributes:
-        query_name: Fully qualified name that was queried.
-        record_type: DNS record type.
-        values: Normalized record values.
-        success: Whether the query completed successfully.
-        error: Error description when the query failed.
     """
 
     query_name: str
@@ -79,8 +72,6 @@ class DNSResolver:
     def normalize_name(name: str) -> str:
         """
         Normalize a DNS name.
-
-        Removes whitespace and a trailing DNS root dot.
         """
 
         normalized = name.strip().lower().rstrip(".")
@@ -117,8 +108,6 @@ class DNSResolver:
             if exchange is not None:
                 exchange_name = str(exchange).lower()
 
-                # A single "." is a meaningful DNS Null MX value.
-                # Do not strip it.
                 if exchange_name != ".":
                     exchange_name = exchange_name.rstrip(".")
 
@@ -159,9 +148,6 @@ class DNSResolver:
     ) -> DNSResult:
         """
         Resolve one DNS record type.
-
-        Returns a structured DNSResult instead of raising normal
-        DNS lookup failures to the caller.
         """
 
         query_name = self.normalize_name(name)
@@ -241,7 +227,9 @@ class DNSResolver:
     def _format_dns_error(
         error: Exception,
     ) -> str:
-        """Return a concise human-readable DNS error."""
+        """
+        Return a concise human-readable DNS error.
+        """
 
         if isinstance(error, dns.resolver.NXDOMAIN):
             return "NXDOMAIN"

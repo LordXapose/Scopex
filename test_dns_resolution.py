@@ -1,12 +1,9 @@
 """
 Tests for the SCOPEX DNS resolution engine.
 
-These tests do not perform live DNS requests.
+All DNSResolver calls are mocked.
 
-DNSResolver is mocked so that the resolution engine can be tested
-deterministically for successful resolution, partial results,
-DNS failures, scope enforcement, deduplication, and candidate
-limits.
+These tests do not perform live DNS requests.
 """
 
 from unittest.mock import Mock
@@ -25,7 +22,9 @@ from scopex.dns.resolution import (
 def build_scope_manager(
     domain: str = "example.com",
 ) -> ScopeManager:
-    """Create a scope manager with one authorized domain."""
+    """
+    Create a scope manager with one authorized domain.
+    """
 
     manager = ScopeManager()
     manager.add_domain(domain)
@@ -37,7 +36,9 @@ def build_candidate(
     root_domain: str = "example.com",
     source: str = "wordlist",
 ) -> SubdomainCandidate:
-    """Create a standard test candidate."""
+    """
+    Create a standard test candidate.
+    """
 
     return SubdomainCandidate(
         name=name,
@@ -56,7 +57,9 @@ def build_engine(
         "CNAME",
     ),
 ) -> DNSResolutionEngine:
-    """Create a resolution engine for tests."""
+    """
+    Create a resolution engine for tests.
+    """
 
     if resolver is None:
         resolver = Mock(spec=DNSResolver)
@@ -73,7 +76,9 @@ def build_engine(
 
 
 class TestResolutionResult:
-    """Tests for the ResolutionResult data structure."""
+    """
+    Tests for ResolutionResult.
+    """
 
     def test_default_values(self) -> None:
         result = ResolutionResult(
@@ -109,7 +114,9 @@ class TestResolutionResult:
 
 
 class TestResolutionEngineInitialization:
-    """Tests for DNSResolutionEngine initialization."""
+    """
+    Tests for DNSResolutionEngine initialization.
+    """
 
     def test_default_configuration(self) -> None:
         resolver = Mock(spec=DNSResolver)
@@ -179,7 +186,9 @@ class TestResolutionEngineInitialization:
 
 
 class TestResolveCandidate:
-    """Tests for resolving one candidate."""
+    """
+    Tests for resolving one candidate.
+    """
 
     def test_successful_a_resolution(self) -> None:
         resolver = Mock(spec=DNSResolver)
@@ -210,9 +219,10 @@ class TestResolveCandidate:
         ]
 
         engine = build_engine(resolver=resolver)
-        candidate = build_candidate()
 
-        result = engine.resolve_candidate(candidate)
+        result = engine.resolve_candidate(
+            build_candidate()
+        )
 
         assert result.name == "api.example.com"
         assert result.root_domain == "example.com"
@@ -629,7 +639,10 @@ class TestResolveCandidate:
 
     def test_candidate_outside_scope_is_rejected(self) -> None:
         resolver = Mock(spec=DNSResolver)
-        engine = build_engine(resolver=resolver)
+
+        engine = build_engine(
+            resolver=resolver,
+        )
 
         candidate = build_candidate(
             name="api.attacker.example",
@@ -646,7 +659,10 @@ class TestResolveCandidate:
 
     def test_root_domain_outside_scope_is_rejected(self) -> None:
         resolver = Mock(spec=DNSResolver)
-        manager = build_scope_manager("example.com")
+
+        manager = build_scope_manager(
+            "example.com",
+        )
 
         engine = build_engine(
             resolver=resolver,
@@ -701,7 +717,9 @@ class TestResolveCandidate:
 
 
 class TestResolveCandidates:
-    """Tests for resolving multiple candidates."""
+    """
+    Tests for resolving multiple candidates.
+    """
 
     def test_resolves_multiple_candidates(self) -> None:
         resolver = Mock(spec=DNSResolver)
@@ -739,7 +757,9 @@ class TestResolveCandidates:
             ),
         ]
 
-        results = engine.resolve_candidates(candidates)
+        results = engine.resolve_candidates(
+            candidates,
+        )
 
         assert len(results) == 2
         assert results[0].name == "api.example.com"
@@ -751,11 +771,15 @@ class TestResolveCandidates:
 
     def test_empty_candidate_list(self) -> None:
         resolver = Mock(spec=DNSResolver)
-        engine = build_engine(resolver=resolver)
+
+        engine = build_engine(
+            resolver=resolver,
+        )
 
         results = engine.resolve_candidates([])
 
         assert results == []
+
         resolver.resolve.assert_not_called()
 
     def test_candidate_limit_is_enforced(self) -> None:
@@ -787,14 +811,23 @@ class TestResolveCandidates:
         )
 
         candidates = [
-            build_candidate(name="one.example.com"),
-            build_candidate(name="two.example.com"),
-            build_candidate(name="three.example.com"),
+            build_candidate(
+                name="one.example.com",
+            ),
+            build_candidate(
+                name="two.example.com",
+            ),
+            build_candidate(
+                name="three.example.com",
+            ),
         ]
 
-        results = engine.resolve_candidates(candidates)
+        results = engine.resolve_candidates(
+            candidates,
+        )
 
         assert len(results) == 2
+
         assert [
             result.name
             for result in results
@@ -805,7 +838,7 @@ class TestResolveCandidates:
 
         assert resolver.resolve.call_count == 2
 
-    def test_generator_like_tuple_is_supported(self) -> None:
+    def test_tuple_candidates_are_supported(self) -> None:
         resolver = Mock(spec=DNSResolver)
 
         resolver.resolve.return_value = [
@@ -826,17 +859,21 @@ class TestResolveCandidates:
             build_candidate(),
         )
 
-        results = engine.resolve_candidates(candidates)
+        results = engine.resolve_candidates(
+            candidates,
+        )
 
         assert len(results) == 1
         assert results[0].name == "api.example.com"
 
 
 class TestResolutionHelpers:
-    """Tests for internal helper behavior."""
+    """
+    Tests for internal helper methods.
+    """
 
     def test_append_unique_preserves_order(self) -> None:
-        values: list[str] = [
+        values = [
             "192.0.2.10",
         ]
 
@@ -864,7 +901,9 @@ class TestResolutionHelpers:
             "AAAA:TIMEOUT",
         ]
 
-        result = DNSResolutionEngine._deduplicate(values)
+        result = DNSResolutionEngine._deduplicate(
+            values,
+        )
 
         assert result == [
             "A:NXDOMAIN",
