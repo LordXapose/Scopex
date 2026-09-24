@@ -11,13 +11,10 @@ from rich.console import Console
 
 from scopex import __version__
 from scopex.cli.doctor import doctor
+from scopex.cli.scan import scan
 from scopex.cli.scope import scope_app
 from scopex.core.logging import configure_logging
 
-
-# ============================================================
-# CLI Application
-# ============================================================
 
 app = typer.Typer(
     name="scopex",
@@ -28,10 +25,6 @@ app = typer.Typer(
 
 console = Console()
 
-
-# ============================================================
-# Global CLI Callback
-# ============================================================
 
 @app.callback(invoke_without_command=True)
 def main(
@@ -44,7 +37,7 @@ def main(
     ),
 ) -> None:
     """
-    SCOPEX - External Attack Surface Intelligence Platform.
+    SCOPEX command-line interface.
     """
 
     configure_logging()
@@ -60,14 +53,10 @@ def main(
         console.print(ctx.get_help())
 
 
-# ============================================================
-# Info Command
-# ============================================================
-
 @app.command()
 def info() -> None:
     """
-    Display basic SCOPEX information.
+    Display SCOPEX information.
     """
 
     console.print()
@@ -90,26 +79,15 @@ def info() -> None:
     )
 
 
-# ============================================================
-# Doctor Command
-# ============================================================
-
 app.command(name="doctor")(doctor)
 
-
-# ============================================================
-# Scope Command Group
-# ============================================================
+app.command(name="scan")(scan)
 
 app.add_typer(
     scope_app,
     name="scope",
 )
 
-
-# ============================================================
-# Application Entry Point
-# ============================================================
 
 if __name__ == "__main__":
     app()
